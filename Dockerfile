@@ -6,7 +6,7 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 RUN set -xe; \
-    apk add coreutils binutils findutils curl python3 alpine-sdk libffi libffi-dev python3-dev; \
+    apk add --no-cache coreutils binutils findutils curl python3 alpine-sdk libffi libffi-dev python3-dev; \
     MAKEFLAGS="$MAKEFLAGS -j $(nproc)"; \
     export MAKEFLAGS; \
     python3 -m venv /usr/local/httpbin; \
@@ -23,7 +23,7 @@ RUN set -xe; \
     deactivate; \
     find -type f -name '*.so*' -exec strip -s '{}' +; \
     rm /root/.cache -rf; \
-    apk del coreutils binutils findutils curl alpine-sdk libffi-dev python3-dev
+    apk del --no-network coreutils binutils findutils curl alpine-sdk libffi-dev python3-dev
 
 EXPOSE 80
 
