@@ -6,9 +6,12 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 RUN set -xe; \
-    apk add --no-cache coreutils binutils findutils curl python3 alpine-sdk libffi libffi-dev python3-dev; \
+    apk add --no-cache python3 libffi; \
+    apk add --no-cache --virtual .httpbin-build-deps \
+        coreutils binutils findutils curl alpine-sdk libffi-dev python3-dev; \
     MAKEFLAGS="$MAKEFLAGS -j $(nproc)"; \
     export MAKEFLAGS; \
+    \
     python3 -m venv /usr/local/httpbin; \
     cd /usr/local/httpbin; \
     mkdir src; \
@@ -19,11 +22,13 @@ RUN set -xe; \
     pip install --upgrade wheel; \
     pip install --upgrade gunicorn 'flask<2' 'werkzeug<2' 'markupsafe<2'; \
     pip install -e src; \
+    \
+# Cleanup
     pip uninstall -y pip wheel; \
     deactivate; \
-    find -type f -name '*.so*' -exec strip -s '{}' +; \
+    find . -type f -name '*.so*' -exec strip -s '{}' +; \
     rm /root/.cache -rf; \
-    apk del --no-network coreutils binutils findutils curl alpine-sdk libffi-dev python3-dev
+    apk del --no-network .httpbin-build-deps
 
 EXPOSE 80
 
